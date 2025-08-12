@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A TAL DA KML CHAVES</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #0f1724;
+      --card: #0b1220;
+      --accent: #ff7aa2;
+      --muted: #cbd5e1;
+      --glass: rgba(255,255,255,0.04);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body {
+      background: linear-gradient(180deg,#f044c5 0%, #0f1724 100%);
+      color: var(--muted);
+      font-family: 'Quicksand', sans-serif;
+    }
+    header {
+      text-align: center;
+      padding: 20px;
+      background: linear-gradient(90deg, rgba(255,122,162,0.07), rgba(255,158,122,0.03));
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    header img {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+      cursor: pointer;
+    }
+    header h1 {
+      margin-top: 20px;
+      color: var(--accent);
+    }
+    .galeria {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      padding: 20px;
+    }
+    .galeria img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+    }
+    .galeria img:hover {
+      transform: scale(1.05);
+    }
+    .mensagem {
+      padding: 20px;
+      text-align: center;
+      background: var(--glass);
+      border-radius: 10px;
+      margin: 20px;
+      color: #e6eef8;
+    }
+    footer {
+      text-align: center;
+      padding: 10px;
+      background: linear-gradient(90deg, rgba(255,122,162,0.07), rgba(255,158,122,0.03));
+      font-size: 14px;
+    }
+    
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .lightbox.show {
+      display: flex;
+    }
+    .lightbox img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 10px;
+    }
+    .lightbox button {
+      position: absolute;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      font-size: 24px;
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+    .btn-close { top: 20px; right: 20px; }
+    .btn-left { left: 20px; top: 50%; transform: translateY(-50%); }
+    .btn-right { right: 20px; top: 50%; transform: translateY(-50%); }
+  </style>
+</head>
+<body>
+  <header>
+    <!-- FOTO DESTAQUE -->
+    <img src="imagens/IMAGEMPRINCIPAL.jpeg" alt="Foto destaque" id="featuredImg" />
+    <h1> FELIZ NO SIMPLES ❤️</h1>
+  </header>
+
+  <!-- SEÇÃO MENSAGEM -->
+  <section id="mensagem" class="mensagem">
+    <h2>Sobre nós</h2>
+    <p>Essas fotos são só o começo da nossa história, e cada uma delas é um pedacinho do que ainda vamos viver juntos.</p>
+  </section>
+
+  <!-- GALERIA DE FOTOS -->
+  <section class="galeria" id="galeria">
+    <img src="imagens/1.jpeg" alt="Foto 1" />
+    <img src="imagens/2.jpeg" alt="Foto 2" />
+    <img src="imagens/3.jpeg" alt="Foto 3" />
+    <img src="imagens/4.jpeg" alt="Foto 4" />
+    <img src="imagens/5.jpeg" alt="Foto 5" />
+    <img src="imagens/6.jpeg" alt="Foto 6" />
+    <img src="imagens/7.jpeg" alt="Foto 7" />
+    <img src="imagens/8.jpeg" alt="Foto 8" />
+    <img src="imagens/9.jpeg" alt="Foto 9" />
+    <img src="imagens/10.jpeg" alt="Foto 10" />
+    <img src="imagens/11.jpeg" alt="Foto 11" />
+    <img src="imagens/12.jpeg" alt="Foto 12" />
+  </section>
+
+  <footer>
+    <p>TE AMO MINHA PRINCESA, TD 2 PASSA NADA E NEM PODE</p>
+  </footer>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <button class="btn-close" id="closeBtn">✕</button>
+    <button class="btn-left" id="prevBtn">◀</button>
+    <img id="lightboxImg" src="" alt="Imagem ampliada">
+    <button class="btn-right" id="nextBtn">▶</button>
+  </div>
+
+  <script>
+    const images = document.querySelectorAll('.galeria img');
+    const featuredImg = document.getElementById('featuredImg');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const closeBtn = document.getElementById('closeBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    let currentIndex = 0;
+
+    function openLightbox(index) {
+      currentIndex = index;
+      lightboxImg.src = images[currentIndex].src;
+      lightbox.classList.add('show');
+    }
+    function closeLightbox() {
+      lightbox.classList.remove('show');
+    }
+    function showNext() {
+      currentIndex = (currentIndex + 1) % images.length;
+      lightboxImg.src = images[currentIndex].src;
+    }
+    function showPrev() {
+      currentIndex = (currentIndex - 1 + images.length) % images.length;
+      lightboxImg.src = images[currentIndex].src;
+    }
+
+    images.forEach((img, i) => {
+      img.addEventListener('click', () => openLightbox(i));
+    });
+    featuredImg.addEventListener('click', () => openLightbox(0));
+    closeBtn.addEventListener('click', closeLightbox);
+    nextBtn.addEventListener('click', showNext);
+    prevBtn.addEventListener('click', showPrev);
+
+    // Fechar ao clicar fora
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) closeLightbox();
+    });
+
+    // Suporte a teclado
+    document.addEventListener('keydown', (e) => {
+      if (!lightbox.classList.contains('show')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowRight') showNext();
+      if (e.key === 'ArrowLeft') showPrev();
+    });
+
+    // Suporte a swipe no celular
+    let startX = 0;
+    lightbox.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+    });
+    lightbox.addEventListener('touchend', (e) => {
+      let endX = e.changedTouches[0].clientX;
+      if (startX - endX > 50) showNext();
+      if (endX - startX > 50) showPrev();
+    });
+  </script>
+</body>
+</html>
