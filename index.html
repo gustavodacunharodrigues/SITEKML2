@@ -42,7 +42,8 @@
       gap: 10px;
       padding: 20px;
     }
-    .galeria img {
+    .galeria img,
+    .galeria video {
       width: 100%;
       height: 150px;
       object-fit: cover;
@@ -51,7 +52,8 @@
       transition: transform 0.3s ease;
       box-shadow: 0 6px 18px rgba(0,0,0,0.5);
     }
-    .galeria img:hover {
+    .galeria img:hover,
+    .galeria video:hover {
       transform: scale(1.05);
     }
     .mensagem {
@@ -81,10 +83,12 @@
     .lightbox.show {
       display: flex;
     }
-    .lightbox img {
+    .lightbox img,
+    .lightbox video {
       max-width: 90%;
       max-height: 90%;
       border-radius: 10px;
+      box-shadow: 0 0 20px rgba(255,255,255,0.5);
     }
     .lightbox button {
       position: absolute;
@@ -95,6 +99,7 @@
       padding: 10px;
       cursor: pointer;
       border-radius: 50%;
+      user-select: none;
     }
     .btn-close { top: 20px; right: 20px; }
     .btn-left { left: 20px; top: 50%; transform: translateY(-50%); }
@@ -103,18 +108,18 @@
 </head>
 <body>
   <header>
-    <!-- FOTO DESTAQUE -->
+   
     <img src="imagens/IMAGEMPRINCIPAL.jpeg" alt="Foto destaque" id="featuredImg" />
     <h1> FELIZ NO SIMPLES ❤️</h1>
   </header>
 
-  <!-- SEÇÃO MENSAGEM -->
+
   <section id="mensagem" class="mensagem">
     <h2>Sobre nós</h2>
     <p>Essas fotos são só o começo da nossa história, e cada uma delas é um pedacinho do que ainda vamos viver juntos.</p>
   </section>
 
-  <!-- GALERIA DE FOTOS -->
+ 
   <section class="galeria" id="galeria">
     <img src="imagens/1.jpeg" alt="Foto 1" />
     <img src="imagens/2.jpeg" alt="Foto 2" />
@@ -144,81 +149,104 @@
     <img src="imagens/26.jpeg" alt="Foto 26" />
     <img src="imagens/27.jpeg" alt="Foto 27" />
     <img src="imagens/28.jpeg" alt="Foto 28" />
+    <img src="imagens/29.jpeg" alt="Foto 29" />
+    <img src="imagens/30.jpeg" alt="Foto 30" />
+    <img src="imagens/31.jpeg" alt="Foto 31" />
+    <video muted preload="metadata">
+      <source src="imagens/VIDEO1.mp4" type="video/mp4" />
+      <source src="imagens/VIDEO2.mp4" type="video/mp4" />
+    </video>
   </section>
 
   <footer>
     <p>TE AMO MINHA PRINCESA, TD 2 PASSA NADA E NEM PODE</p>
   </footer>
 
-  <!-- Lightbox -->
-  <div class="lightbox" id="lightbox">
-    <button class="btn-close" id="closeBtn">✕</button>
-    <button class="btn-left" id="prevBtn">◀</button>
-    <img id="lightboxImg" src="" alt="Imagem ampliada">
-    <button class="btn-right" id="nextBtn">▶</button>
-  </div>
+  
+  <div class="lightbox" id="lightbox"></div>
 
   <script>
-    const images = document.querySelectorAll('.galeria img');
+    const galleryItems = document.querySelectorAll('.galeria img, .galeria video');
     const featuredImg = document.getElementById('featuredImg');
     const lightbox = document.getElementById('lightbox');
-    const lightboxImg = document.getElementById('lightboxImg');
-    const closeBtn = document.getElementById('closeBtn');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
     let currentIndex = 0;
 
-    function openLightbox(index) {
+    function createLightboxContent(item) {
+      if(item.tagName.toLowerCase() === 'img'){
+        return `
+          <button class="btn-close" id="closeBtn">✕</button>
+          <button class="btn-left" id="prevBtn">◀</button>
+          <img src="${item.src}" alt="Imagem ampliada" />
+          <button class="btn-right" id="nextBtn">▶</button>
+        `;
+      } else if(item.tagName.toLowerCase() === 'video'){
+        const source = item.querySelector('source').src;
+        return `
+          <button class="btn-close" id="closeBtn">✕</button>
+          <button class="btn-left" id="prevBtn">◀</button>
+          <video controls autoplay style="max-width:90%; max-height:90%; border-radius:10px;">
+            <source src="${source}" type="video/mp4" />
+            Seu navegador não suporta o elemento de vídeo.
+          </video>
+          <button class="btn-right" id="nextBtn">▶</button>
+        `;
+      }
+    }
+
+    function openLightbox(index){
       currentIndex = index;
-      lightboxImg.src = images[currentIndex].src;
+      lightbox.innerHTML = createLightboxContent(galleryItems[currentIndex]);
       lightbox.classList.add('show');
+
+      document.getElementById('closeBtn').addEventListener('click', closeLightbox);
+      document.getElementById('prevBtn').addEventListener('click', showPrev);
+      document.getElementById('nextBtn').addEventListener('click', showNext);
     }
-    function closeLightbox() {
+
+    function closeLightbox(){
       lightbox.classList.remove('show');
-    }
-    function showNext() {
-      currentIndex = (currentIndex + 1) % images.length;
-      lightboxImg.src = images[currentIndex].src;
-    }
-    function showPrev() {
-      currentIndex = (currentIndex - 1 + images.length) % images.length;
-      lightboxImg.src = images[currentIndex].src;
+      lightbox.innerHTML = ''; 
     }
 
-    images.forEach((img, i) => {
-      img.addEventListener('click', () => openLightbox(i));
+    function showNext(){
+      currentIndex = (currentIndex + 1) % galleryItems.length;
+      openLightbox(currentIndex);
+    }
+
+    function showPrev(){
+      currentIndex = (currentIndex - 1 + galleryItems.length) % galleryItems.length;
+      openLightbox(currentIndex);
+    }
+
+    galleryItems.forEach((item, index) => {
+      item.addEventListener('click', () => openLightbox(index));
     });
+
     featuredImg.addEventListener('click', () => openLightbox(0));
-    closeBtn.addEventListener('click', closeLightbox);
-    nextBtn.addEventListener('click', showNext);
-    prevBtn.addEventListener('click', showPrev);
 
-    // Fechar ao clicar fora
-    lightbox.addEventListener('click', (e) => {
-      if (e.target === lightbox) closeLightbox();
+    
+    lightbox.addEventListener('click', e => {
+      if(e.target === lightbox) closeLightbox();
     });
 
-    // Suporte a teclado
-    document.addEventListener('keydown', (e) => {
-      if (!lightbox.classList.contains('show')) return;
-      if (e.key === 'Escape') closeLightbox();
-      if (e.key === 'ArrowRight') showNext();
-      if (e.key === 'ArrowLeft') showPrev();
+    
+    document.addEventListener('keydown', e => {
+      if(!lightbox.classList.contains('show')) return;
+      if(e.key === 'Escape') closeLightbox();
+      if(e.key === 'ArrowRight') showNext();
+      if(e.key === 'ArrowLeft') showPrev();
     });
 
-    // Suporte a swipe no celular
+    
     let startX = 0;
-    lightbox.addEventListener('touchstart', (e) => {
+    lightbox.addEventListener('touchstart', e => {
       startX = e.touches[0].clientX;
     });
-    lightbox.addEventListener('touchend', (e) => {
+    lightbox.addEventListener('touchend', e => {
       let endX = e.changedTouches[0].clientX;
-      if (startX - endX > 50) showNext();
-      if (endX - startX > 50) showPrev();
+      if(startX - endX > 50) showNext();
+      if(endX - startX > 50) showPrev();
     });
   </script>
 </body>
 </html>
-
-
-
